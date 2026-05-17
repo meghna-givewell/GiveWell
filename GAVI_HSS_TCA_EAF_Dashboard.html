@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAVI Cash Grants: HSS · TCA · EAF</title>
+<!-- EAF = Equity Accelerator Funding -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #f4f6f9; color: #2d3748; }
+  header { background: #1a365d; color: white; padding: 28px 40px; }
+  header h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.3px; }
+  header p  { font-size: 13px; color: #90cdf4; margin-top: 4px; }
+  .legend-row { display: flex; gap: 24px; margin-top: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+  .legend-dot  { width: 12px; height: 12px; border-radius: 50%; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+           padding: 24px 40px 0; }
+  .stat  { background: white; border-radius: 10px; padding: 20px 24px;
+           box-shadow: 0 1px 4px rgba(0,0,0,.06); border-top: 4px solid; }
+  .stat.hss { border-color: #3b82f6; }
+  .stat.tca { border-color: #f59e0b; }
+  .stat.eaf { border-color: #10b981; }
+  .stat .prog { font-size: 11px; font-weight: 700; letter-spacing: 1px;
+                text-transform: uppercase; color: #718096; }
+  .stat .total { font-size: 28px; font-weight: 700; margin: 6px 0 4px; }
+  .stat.hss .total { color: #3b82f6; }
+  .stat.tca .total { color: #f59e0b; }
+  .stat.eaf .total { color: #10b981; }
+  .stat .sub { font-size: 12px; color: #718096; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+          padding: 24px 40px; }
+  .card { background: white; border-radius: 10px; padding: 24px;
+          box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .card.wide { grid-column: 1 / -1; }
+  .card h2 { font-size: 14px; font-weight: 600; color: #4a5568;
+             margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.5px; }
+  canvas { max-height: 360px; }
+  .card.wide canvas { max-height: 400px; }
+  footer { text-align: center; padding: 20px; font-size: 12px; color: #a0aec0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GAVI Cash Grants — HSS · TCA · EAF</h1>
+  <p>Source: GAVI_Commitments-Approvals-Disbursements · "Database - ALL &amp; HISTORICAL-PFM" · Priority Description = Cash</p>
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>HSS — Health System Strengthening</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>TCA — Targeted Country Assistance</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>EAF — Equity Accelerator Funding</div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat hss">
+    <div class="prog">HSS</div>
+    <div class="total">$2.84B</div>
+    <div class="sub">4,471 records · Budget periods 2008–2029</div>
+  </div>
+  <div class="stat tca">
+    <div class="prog">TCA</div>
+    <div class="total">$1.06B</div>
+    <div class="sub">Targeted Country Assistance · 7,317 records · Budget periods 2022–2025</div>
+  </div>
+  <div class="stat eaf">
+    <div class="prog">EAF</div>
+    <div class="total">$754M</div>
+    <div class="sub">Equity Accelerator Funding · 983 records · Budget periods 2022–2028</div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- Chart 1: Fiscal Year Trend -->
+  <div class="card">
+    <h2>Annual Funding by Fiscal Year (USD millions)</h2>
+    <canvas id="fyChart"></canvas>
+  </div>
+
+  <!-- Chart 2: Budget Period Timeline -->
+  <div class="card">
+    <h2>Budget Period Timeline (USD millions)</h2>
+    <canvas id="bpChart"></canvas>
+  </div>
+
+  <!-- Chart 3: Country Breakdown — wide -->
+  <div class="card wide">
+    <h2>Top 20 Countries — Funding by Program (USD millions)</h2>
+    <canvas id="countryChart"></canvas>
+  </div>
+
+  <!-- Chart 4: Implementors -->
+  <div class="card">
+    <h2>Top Implementors by Program (USD millions)</h2>
+    <canvas id="implChart"></canvas>
+  </div>
+
+  <!-- Chart 5: Measure Type -->
+  <div class="card">
+    <h2>Measure Type Breakdown (USD millions)</h2>
+    <canvas id="measureChart"></canvas>
+  </div>
+
+</div>
+<div class="grid">
+
+  <!-- Chart 6: Implementors over time — all programs -->
+  <div class="card wide">
+    <h2>Top Implementors Over Time — All Programs Combined (USD millions, named implementors only)</h2>
+    <canvas id="implTimeChart"></canvas>
+  </div>
+
+
+</div>
+
+
+<div class="grid">
+
+  <!-- Chart 8: Material Description — all programs combined -->
+  <div class="card wide">
+    <h2>Material Description — All Programs Combined (USD millions)</h2>
+    <canvas id="matCombinedChart"></canvas>
+  </div>
+
+
+</div>
+
+<footer>Generated from GAVI public data · May 2026</footer>
+
+<script>
+const HSS = '#3b82f6', TCA = '#f59e0b', EAF = '#10b981';
+const HSS_a = 'rgba(59,130,246,.18)', TCA_a = 'rgba(245,158,11,.18)', EAF_a = 'rgba(16,185,129,.18)';
+
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#4a5568';
+
+// ── 1. Fiscal Year line chart ─────────────────────────────
+new Chart(document.getElementById('fyChart'), {
+  type: 'line',
+  data: {
+    labels: ["2019","2020","2021","2022","2023","2024"],
+    datasets: [
+      { label:'HSS', data:[205.0,91.5,378.5,369.0,1113.8,680.9],
+        borderColor:HSS, backgroundColor:HSS_a, borderWidth:2.5,
+        pointRadius:5, pointHoverRadius:7, fill:true, tension:0.3 },
+      { label:'TCA (Targeted Country Assistance)', data:[0.0,0.0,385.2,277.6,213.4,188.3],
+        borderColor:TCA, backgroundColor:TCA_a, borderWidth:2.5,
+        pointRadius:5, pointHoverRadius:7, fill:true, tension:0.3 },
+      { label:'EAF (Equity Accelerator Funding)', data:[0.0,0.0,0.0,11.1,389.1,353.8],
+        borderColor:EAF, backgroundColor:EAF_a, borderWidth:2.5,
+        pointRadius:5, pointHoverRadius:7, fill:true, tension:0.3 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'}, tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(0)}M`}} },
+    scales:{
+      y:{ beginAtZero:true, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} },
+      x:{ grid:{display:false} }
+    }
+  }
+});
+
+// ── 2. Budget Period bar chart ────────────────────────────
+new Chart(document.getElementById('bpChart'), {
+  type: 'bar',
+  data: {
+    labels: ["2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026","2027","2028","2029"],
+    datasets: [
+      { label:'HSS', data:[1.4,12.1,24.5,82.7,145.7,490.8,278.6,528.8,750.5,328.6,118.1,54.7,25.9,1.8],
+        backgroundColor:HSS, borderRadius:3 },
+      { label:'TCA (Targeted Country Assistance)', data:[0,0,0,0,0,0,360.6,278.9,263.2,161.7,0,0,0,0],
+        backgroundColor:TCA, borderRadius:3 },
+      { label:'EAF (Equity Accelerator Funding)', data:[0,0,0,0,0,0,8.1,195.6,324.2,197.2,22.5,6.5,0,0],
+        backgroundColor:EAF, borderRadius:3 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'}, tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(0)}M`}} },
+    scales:{
+      x:{ stacked:false, grid:{display:false} },
+      y:{ beginAtZero:true, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} }
+    }
+  }
+});
+
+// ── 3. Country stacked bar ────────────────────────────────
+new Chart(document.getElementById('countryChart'), {
+  type: 'bar',
+  data: {
+    labels: ["Ethiopia","Congo, DR","India","Pakistan","Nigeria","Afghanistan","Niger","Uganda","Syria","Somalia","Yemen","Chad","Sudan","Mozambique","Mali","South Sudan","Papua New Guinea","Bangladesh","Madagascar","Cameroon"],
+    datasets: [
+      { label:'HSS', data:[264.7,218.4,347.2,171.0,163.3,82.5,77.7,92.2,78.7,76.2,76.5,53.9,73.3,92.6,52.6,53.5,71.7,87.0,55.5,56.4],
+        backgroundColor:HSS, borderRadius:3 },
+      { label:'TCA (Targeted Country Assistance)', data:[56.2,55.6,1.5,47.5,57.9,26.7,29.4,17.1,32.7,32.2,25.1,38.9,30.7,21.1,32.9,32.6,31.0,15.5,14.7,18.1],
+        backgroundColor:TCA, borderRadius:3 },
+      { label:'EAF (Equity Accelerator Funding)', data:[117.4,146.6,0.0,73.2,0.0,41.6,26.3,23.7,20.9,20.8,23.0,24.0,12.1,0.0,19.3,18.0,0.0,0.0,23.5,17.4],
+        backgroundColor:EAF, borderRadius:3 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'}, tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(0)}M`}} },
+    scales:{
+      x:{ stacked:true, grid:{display:false},
+          ticks:{ maxRotation:40, minRotation:30 } },
+      y:{ stacked:true, beginAtZero:true, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} }
+    }
+  }
+});
+
+// ── 4. Implementors grouped bar ───────────────────────────
+new Chart(document.getElementById('implChart'), {
+  type: 'bar',
+  data: {
+    labels: ["UNICEF","MOH","WHO","UNDP","UNICEF SD","SANRU","ACASUS","CHAI","IBRD","JSI","CSOM","GFA"],
+    datasets: [
+      { label:'HSS', data:[487.5,370.3,154.7,89.9,76.6,23.4,5.1,6.3,28.8,6.9,6.7,23.9],
+        backgroundColor:HSS, borderRadius:3 },
+      { label:'TCA (Targeted Country Assistance)', data:[203.1,0.0,173.3,0.4,0.0,0.0,29.4,25.8,7.3,15.0,0.4,0.0],
+        backgroundColor:TCA, borderRadius:3 },
+      { label:'EAF (Equity Accelerator Funding)', data:[92.3,73.0,34.6,0.0,0.0,30.4,5.0,5.0,0.0,3.0,17.4,0.0],
+        backgroundColor:EAF, borderRadius:3 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'}, tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(0)}M`}} },
+    scales:{
+      x:{ grid:{display:false}, ticks:{maxRotation:35,minRotation:20} },
+      y:{ beginAtZero:true, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} }
+    }
+  }
+});
+
+// ── 5. Measure type grouped bar ───────────────────────────
+new Chart(document.getElementById('measureChart'), {
+  type: 'bar',
+  data: {
+    labels: ['ENDB & PREB\n(Endorsed budgets)', 'APRB & OPRB\n(Approved budgets)', 'Payments in USD'],
+    datasets: [
+      { label:'HSS', data:[1163.5,936.0,739.3], backgroundColor:HSS, borderRadius:4 },
+      { label:'TCA (Targeted Country Assistance)', data:[430.8,393.9,239.8],  backgroundColor:TCA, borderRadius:4 },
+      { label:'EAF (Equity Accelerator Funding)', data:[343.3,301.5,109.3],  backgroundColor:EAF, borderRadius:4 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'}, tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(0)}M`}} },
+    scales:{
+      x:{ grid:{display:false} },
+      y:{ beginAtZero:true, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} }
+    }
+  }
+});
+
+// ── 6. Implementors over time — all programs combined ─────
+new Chart(document.getElementById('implTimeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      { label:'UNICEF',    data:[0,4.1,94.6,198.3,296.7,189.1], backgroundColor:'#3b82f6', borderRadius:2 },
+      { label:'MOH',       data:[0,0,48.6,83.0,220.4,91.3],     backgroundColor:'#10b981', borderRadius:2 },
+      { label:'WHO',       data:[0,0.8,36.9,99.0,96.9,129.0],   backgroundColor:'#f59e0b', borderRadius:2 },
+      { label:'UNDP',      data:[0,0,4.6,0.9,84.6,0.2],         backgroundColor:'#8b5cf6', borderRadius:2 },
+      { label:'UNICEF SD', data:[0,0,24.4,24.7,24.3,3.1],       backgroundColor:'#06b6d4', borderRadius:2 },
+      { label:'IBRD',      data:[0,0,33.5,16.6,-15.3,1.3],      backgroundColor:'#ef4444', borderRadius:2 },
+      { label:'SANRU',     data:[0,4.5,4.5,5.7,34.4,4.7],       backgroundColor:'#84cc16', borderRadius:2 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'},
+      tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(1)}M`}},
+      title:{display:true, text:'Note: large share of amounts have no implementor recorded (see findings below)', font:{size:11}, color:'#718096'}
+    },
+    scales:{
+      x:{ stacked:true, grid:{display:false} },
+      y:{ stacked:true, beginAtZero:false, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} }
+    }
+  }
+});
+
+// ── 8. Material Description — all programs combined ───────
+new Chart(document.getElementById('matCombinedChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2019','2020','2021','2022','2023','2024'],
+    datasets: [
+      { label:'Unspecified',             data:[205.0,91.5,554.6,401.4,1318.5,943.9], backgroundColor:'#cbd5e1', borderRadius:2 },
+      { label:'Cash → Impl. Partners',   data:[0,0,122.2,100.9,191.4,115.8],         backgroundColor:'#3b82f6', borderRadius:2 },
+      { label:'Cash → MOH',              data:[0,0,62.9,52.4,111.0,57.2],            backgroundColor:'#10b981', borderRadius:2 },
+      { label:'TCA Program Impl.',       data:[0,0,0,81.9,30.3,12.1],                backgroundColor:'#f59e0b', borderRadius:2 },
+      { label:'PEF TCA Country',         data:[0,0,0,0,28.3,64.9],                   backgroundColor:'#f97316', borderRadius:2 },
+      { label:'CCEOP Equipment',         data:[0,0,24.0,18.4,16.8,0.1],              backgroundColor:'#06b6d4', borderRadius:2 },
+      { label:'Fin. Mgmt & Risk',        data:[0,0,0,1.9,14.0,12.9],                 backgroundColor:'#8b5cf6', borderRadius:2 },
+      { label:'TCA Multi-Country Prog.', data:[0,0,0,0,4.8,16.0],                    backgroundColor:'#84cc16', borderRadius:2 },
+      { label:'TCA Ind. Consultant',     data:[0,0,0,0.9,1.3,0.1],                   backgroundColor:'#e879f9', borderRadius:2 },
+    ]
+  },
+  options: {
+    responsive:true, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{position:'top'}, tooltip:{callbacks:{label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(1)}M`}} },
+    scales:{
+      x:{ stacked:true, grid:{display:false} },
+      y:{ stacked:true, beginAtZero:true, ticks:{callback:v=>'$'+v+'M'}, grid:{color:'#e2e8f0'} }
+    }
+  }
+});
+</script>
+</body>
+</html>
