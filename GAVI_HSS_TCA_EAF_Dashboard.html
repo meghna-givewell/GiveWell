@@ -42,6 +42,16 @@
   canvas { max-height: 360px; }
   .card.wide canvas { max-height: 400px; }
   footer { text-align: center; padding: 20px; font-size: 12px; color: #a0aec0; }
+  .glossary { padding: 0 40px 28px; }
+  .glossary details { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .glossary summary { font-size: 13px; font-weight: 600; color: #4a5568; padding: 14px 20px;
+                      cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; list-style: none; display: flex; align-items: center; gap: 8px; }
+  .glossary summary::before { content: '▸'; color: #a0aec0; transition: transform 0.2s; }
+  .glossary details[open] summary::before { transform: rotate(90deg); }
+  .glossary table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .glossary td { padding: 8px 20px; border-top: 1px solid #f0f0f0; vertical-align: top; }
+  .glossary td:first-child { font-weight: 700; color: #2d3748; width: 160px; white-space: nowrap; }
+  .glossary td:last-child { color: #4a5568; }
 </style>
 </head>
 <body>
@@ -144,6 +154,23 @@
 
 </div>
 
+<div class="glossary">
+  <details>
+    <summary>Acronym Glossary</summary>
+    <table>
+      <tr><td>CCEOP</td><td>Cold Chain Equipment Optimization Platform</td></tr>
+      <tr><td>EAF</td><td>Equity Accelerator Funding</td></tr>
+      <tr><td>HPV</td><td>Human Papillomavirus Vaccine</td></tr>
+      <tr><td>HSS</td><td>Health System Strengthening</td></tr>
+      <tr><td>IPV</td><td>Inactivated Polio Vaccine</td></tr>
+      <tr><td>MICS</td><td>Middle-income Countries</td></tr>
+      <tr><td>OCV</td><td>Oral Cholera Vaccine</td></tr>
+      <tr><td>PCV</td><td>Pneumococcal Conjugate Vaccines</td></tr>
+      <tr><td>TCA</td><td>Targeted Country Assistance</td></tr>
+      <tr><td>TCV</td><td>Typhoid Conjugate Vaccine</td></tr>
+    </table>
+  </details>
+</div>
 <footer>Generated from GAVI public data · May 2026</footer>
 
 <script>
