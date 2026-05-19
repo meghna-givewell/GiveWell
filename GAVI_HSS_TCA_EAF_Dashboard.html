@@ -17,7 +17,7 @@
   .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; }
   .legend-dot  { width: 12px; height: 12px; border-radius: 50%; }
 
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
            padding: 24px 40px 0; }
   .stat  { background: white; border-radius: 10px; padding: 20px 24px;
            box-shadow: 0 1px 4px rgba(0,0,0,.06); border-top: 4px solid; }
@@ -63,6 +63,7 @@
     <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>HSS — Health System Strengthening</div>
     <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>TCA — Targeted Country Assistance</div>
     <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>EAF — Equity Accelerator Funding</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>CCEOP — Cold Chain Equipment Optimization Platform</div>
   </div>
 </header>
 
@@ -79,8 +80,8 @@
 
 <div style="padding: 8px 40px 24px">
   <div style="border-top: 2px solid #cbd5e1; padding-top: 18px; display:flex; align-items:center; gap:12px">
-    <span style="background:#1a365d; color:white; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:4px 12px; border-radius:20px; white-space:nowrap">HSS · TCA · EAF Deep Dive</span>
-    <span style="font-size:12px; color:#718096;">The following charts focus on Health System Strengthening, Targeted Country Assistance, and Equity Accelerator Funding only.</span>
+    <span style="background:#1a365d; color:white; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:4px 12px; border-radius:20px; white-space:nowrap">HSS · TCA · EAF · CCEOP Deep Dive</span>
+    <span style="font-size:12px; color:#718096;">The following charts focus on Health System Strengthening, Targeted Country Assistance, Equity Accelerator Funding, and Cold Chain Equipment Optimization Platform only.</span>
   </div>
 </div>
 
@@ -99,6 +100,11 @@
     <div class="prog">EAF</div>
     <div class="total">$754M</div>
     <div class="sub">Equity Accelerator Funding · 983 records · Budget periods 2022–2028</div>
+  </div>
+  <div class="stat" style="border-color:#06b6d4">
+    <div class="prog" style="color:#718096">CCEOP</div>
+    <div class="total" style="color:#06b6d4">$368M</div>
+    <div class="sub">Cold Chain Equipment Optimization Platform · 1,265 records · Budget periods 2017–2025</div>
   </div>
 </div>
 
@@ -187,8 +193,8 @@
 <footer>Generated from GAVI public data · May 2026</footer>
 
 <script>
-const HSS = '#3b82f6', TCA = '#f59e0b', EAF = '#10b981';
-const HSS_a = 'rgba(59,130,246,.18)', TCA_a = 'rgba(245,158,11,.18)', EAF_a = 'rgba(16,185,129,.18)';
+const HSS = '#3b82f6', TCA = '#f59e0b', EAF = '#10b981', CCEOP = '#06b6d4';
+const HSS_a = 'rgba(59,130,246,.18)', TCA_a = 'rgba(245,158,11,.18)', EAF_a = 'rgba(16,185,129,.18)', CCEOP_a = 'rgba(6,182,212,.18)';
 
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 Chart.defaults.font.size = 12;
@@ -208,6 +214,9 @@ new Chart(document.getElementById('fyChart'), {
         pointRadius:5, pointHoverRadius:7, fill:true, tension:0.3 },
       { label:'EAF (Equity Accelerator Funding)', data:[0.0,0.0,0.0,11.1,389.1,353.8],
         borderColor:EAF, backgroundColor:EAF_a, borderWidth:2.5,
+        pointRadius:5, pointHoverRadius:7, fill:true, tension:0.3 },
+      { label:'CCEOP (Cold Chain Equipment Optimization Platform)', data:[7.6,19.4,38.6,27.7,72.8,202.0],
+        borderColor:CCEOP, backgroundColor:CCEOP_a, borderWidth:2.5,
         pointRadius:5, pointHoverRadius:7, fill:true, tension:0.3 },
     ]
   },
@@ -233,6 +242,8 @@ new Chart(document.getElementById('bpChart'), {
         backgroundColor:TCA, borderRadius:3 },
       { label:'EAF (Equity Accelerator Funding)', data:[0,0,0,0,0,0,8.1,195.6,324.2,197.2,22.5,6.5,0,0],
         backgroundColor:EAF, borderRadius:3 },
+      { label:'CCEOP (Cold Chain Equipment Optimization Platform)', data:[0,0.5,0.3,14.9,17.9,33.9,14.2,108.7,130.5,47.3,0,0,0,0],
+        backgroundColor:CCEOP, borderRadius:3 },
     ]
   },
   options: {
@@ -257,6 +268,8 @@ new Chart(document.getElementById('countryChart'), {
         backgroundColor:TCA, borderRadius:3 },
       { label:'EAF (Equity Accelerator Funding)', data:[117.4,146.6,0.0,73.2,0.0,41.6,26.3,23.7,20.9,20.8,23.0,24.0,12.1,0.0,19.3,18.0,0.0,0.0,23.5,17.4],
         backgroundColor:EAF, borderRadius:3 },
+      { label:'CCEOP (Cold Chain Equipment Optimization Platform)', data:[60.9,0.0,0.0,79.6,0.0,18.4,16.9,24.4,14.7,15.1,3.7,0.0,1.2,12.4,0.0,9.1,0.0,2.0,17.3,16.1],
+        backgroundColor:CCEOP, borderRadius:3 },
     ]
   },
   options: {
@@ -282,6 +295,8 @@ new Chart(document.getElementById('implChart'), {
         backgroundColor:TCA, borderRadius:3 },
       { label:'EAF (Equity Accelerator Funding)', data:[92.3,73.0,34.6,0.0,0.0,30.4,5.0,5.0,0.0,3.0,17.4,0.0],
         backgroundColor:EAF, borderRadius:3 },
+      { label:'CCEOP (Cold Chain Equipment Optimization Platform)', data:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+        backgroundColor:CCEOP, borderRadius:3 },
     ]
   },
   options: {
@@ -303,6 +318,7 @@ new Chart(document.getElementById('measureChart'), {
       { label:'HSS (Health System Strengthening)', data:[1163.5,936.0,739.3], backgroundColor:HSS, borderRadius:4 },
       { label:'TCA (Targeted Country Assistance)', data:[430.8,393.9,239.8],  backgroundColor:TCA, borderRadius:4 },
       { label:'EAF (Equity Accelerator Funding)', data:[343.3,301.5,109.3],  backgroundColor:EAF, borderRadius:4 },
+      { label:'CCEOP (Cold Chain Equipment Optimization Platform)', data:[159.4,152.8,56.0], backgroundColor:CCEOP, borderRadius:4 },
     ]
   },
   options: {
